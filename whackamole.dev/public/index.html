@@ -1,0 +1,142 @@
+<html lang="en">
+
+<head>
+  <title>Whack-A-Mole</title>
+
+  <link rel="stylesheet" href="css/animate.css">
+  <link rel="stylesheet" href="css/whackamole.css">
+
+  <script type="text/javascript" src="js/whackamole.js"></script>
+  <!--Javascript -->
+  <script type="text/javascript" src="jquery.js"></script>
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- link to google font Lobster -->
+  <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+  <h1 class="animated swing" id="header">Whack-A-Mole</h1>
+    <div id="game_window">
+
+      <div class="hole" id="hole1"><img id="mole1" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole2"><img id="mole2" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole3"><img id="mole3" class="mole" src="/img/mole.png"></div>
+
+      <div class="hole" id="hole4" style="clear:left"><img id="mole4" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole5" ><img id="mole5" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole6" ><img id="mole6" class="mole" src="/img/mole.png"></div>
+
+      <div class="hole" id="hole7" style="clear:left"><img id="mole7" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole8"><img id="mole8" class="mole" src="/img/mole.png"></div>
+      <div class="hole" id="hole9"><img id="mole9" class="mole" src="/img/mole.png"></div>
+      
+      <div class='info'>
+      <a href="#" class="btn btn-success btn-lg" id="start_button" ><span class="glyphicon glyphicon-heart-empty"></span> Start </a> 
+
+      <div id='gameover'>
+        <p id='play_again'>The End.</p>
+        <div id='final_score'></div>
+      </div>
+
+    </div>
+  </div>
+  <!--end game window -->
+
+  <!--score footer -->
+  <div id="info">
+    <div id="info_score">Score: <span id="score">0</span></div>
+    <div id="info_timer">Timer: <span id="timer">0</span></div>
+  </div>
+
+<!--logic -->
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    
+  <script>
+  //declare audio variables
+  var audio = new Audio('audio/gun_shot_cut.wav');
+  var audio2 = new Audio('/audio/backgroundaudio.mp3');
+  var audio3 = new Audio('/audio/loadgun.wav');
+  //start background music on load
+  audio2.play();
+  //constants: how many moles
+  const MIN = 1; // first box
+  const MAX = 9; // last box
+  //variables
+  var random_mole_number = 0; //assign random number
+  var score = 0; //keeps track of score
+  var interval = 1000; // mole fade in and out interval time is 1 second
+  var time = $('#info_timer span').text() || 0;
+
+
+  // Returns a random integer between min and max
+  // Using Math.round() will give you a non-uniform distribution!
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  } 
+
+  var StartGame = function(){
+    $('#start_button').hide();
+    time=10;
+    audio2.pause();
+    audio2.currentTime = 0;
+    audio3.play();
+    $('#game_window').css('cursor','url(img/crosshair.png), auto');
+    $('.mole').show();
+    NewMole();
+    timeId = setInterval(timer, 1000);
+    setTimeout(GameOver, 10000);
+  }
+     
+  var NewMole = function() {
+    $('.mole').hide("explode");
+
+    if ( time == 0 ) {
+      GameOver();
+    } else {
+      moleAction();
+    }
+  }
+
+  var moleAction = function() {
+    var moleInterval = setInterval(function(){
+      random_mole_number = getRandomInt(MIN, MAX);
+      $(('#mole'+random_mole_number)).attr('src',"img/mole.png").fadeIn(1000).fadeOut();
+    ;}, interval);
+    //here's the click action!
+    $('.mole').click(function(event) {
+      audio.play();
+      score += 10;
+      //moleInterval -=550;
+      $(this).attr('src',"img/mole_dead.png");
+      $('#info_score').text('Score: '+score);
+      });
+  }
+      
+  var timer = function() {
+    time--;
+    if ( time == 0 ) {
+      clearInterval(timeId);
+    }
+    //as time decrements, display in id=timer
+    $('#timer').html(time);
+  }
+
+  var GameOver= function() {  
+    clearInterval(random_mole_number);
+    $('.hole').hide();
+    // clearInterval(moleInterval);
+    $('#gameover').fadeIn();
+    $('#final_score').text('Final score: '+score);
+    //$('#start_button').show().click(StartGame);
+  }
+
+  //start the game!!
+  $("#start_button").click(StartGame);
+
+</script>
+
+</body>
+
+
+</html>
